@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Login</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+    
+    <div id="app">
+        <div>
+            <h1>Login</h1>
+            <form @submit.prevent="loginUser">
+                <label>Username:</label>
+                <input type="text" v-model="username" /><br><br>
+                <label>Password:</label>
+                <input type="password" v-model="password" /><br><br>
+                <button type="submit">Login</button>
+            </form>
+            
+            <p v-if="responseMessage">{{ responseMessage }}</p>
+        </div>
+    </div>
+
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    username: '',
+                    password: '',
+                    responseMessage: ''
+                };
+            },
+            methods: {
+                async loginUser() {
+                    try {
+                        const response = await axios.post('http://127.0.0.1:8000/developer_auth', {
+                            username: this.username,
+                            password: this.password
+                        });
+                        this.responseMessage = response.data.message;
+                    } catch (error) {
+                        if (error.response) {
+                            this.responseMessage = error.response.data.detail || 'An error occurred';
+                        } else {
+                            this.responseMessage = 'Unable to connect to the server';
+                        }
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
