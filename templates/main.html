@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>JWT Protected Route</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+
+
+    <div id="app">
+        <h2>JWT Token Protected Route</h2>
+        <button @click="accessProtectedRoute">Access Protected API</button>
+        <p v-if="message">{{ message }}</p>
+    </div>
+
+    <div id="app2">
+        <h2>create owner and company</h2>
+
+        <div>
+            <form @submit.prevent="submitForm">
+                <label>company_name:</label>
+                <input type="text" v-model="form.company_name" required><br><br>
+
+                <label>owner_name:</label>
+                <input type="text" v-model="form.owner_name" required><br><br>
+
+                <label>phone:</label>
+                <input type="number" v-model="form.phone" required><br><br>
+
+                <label>username:</label>
+                <input type="text" v-model="form.username" required><br><br>
+
+                <label>password:</label>
+                <input type="password" v-model="form.password" required><br><br>
+
+                <label>company_type:</label>
+                <input type="text" v-model="form.company_type" required><br><br>
+
+                <label>Email:</label>
+                <input type="email" v-model="form.email" required><br><br>
+
+
+                <button type="submit">Send</button>
+            </form>
+            <p>{{ responseMessage }}</p>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+
+        createApp({
+            data() {
+                return {
+                    form: {
+                        owner_name: '',
+                        phone: '',
+                        username: '',
+                        password: '',
+                        company_type: ''
+                      
+
+                    },
+                    responseMessage: ''
+                };
+            },
+
+            methods: {
+                async submitForm() {
+                    try {
+                        const response = await axios.post('http://127.0.0.1:8000/contact', this.form);
+                        this.responseMessage = response.data.message;
+
+                    } catch (error) {
+                        this.responseMessage = error.response?.data?.detail || 'Something went wrong!';
+                    }
+                }
+            }
+        }).mount('#app');
+
+
+        createApp({
+            data() {
+                return {
+                    message: ''
+                };
+            }, methods: {
+
+                accessProtectedRoute() {
+                    const token = localStorage.getItem('jwtToken'); // or sessionStorage.getItem('jwtToken')
+
+                    if (!token) {
+                        this.message = "Token not found. Please login first.";
+                        return;
+                    }
+
+                    axios.get('http://localhost:8000/protected', { // Change URL if needed
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    })
+                        .then(response => {
+                            this.message = response.data.message + ' | User: ' + response.data.user;
+                        })
+                        .catch(error => {
+                            this.message = 'Access denied: ' + (error.response?.data?.detail || error.message);
+                        });
+                }
+
+            }
+        }).mount("#app");
+    </script>
+
+</body>
+
+</html>

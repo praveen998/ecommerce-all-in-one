@@ -22,29 +22,74 @@
             </form>
             
             <p v-if="responseMessage">{{ responseMessage }}</p>
+            <p v-if="tokens">{{ tokens }}</p>
         </div>
     </div>
+
+    <div id="app2">
+        <h2>JWT Token Protected Route</h2>
+        <button @click="accessProtectedRoute">Access Protected API</button>
+        <p v-if="message">{{ message }}</p>
+      </div>
+
 
 
     <script>
         const { createApp } = Vue;
+        createApp({
+            data(){
+                return{
+                    message: ''
+                };
+            },methods:{
+
+        accessProtectedRoute() {
+        const token = localStorage.getItem('jwtToken'); // or sessionStorage.getItem('jwtToken')
+
+        if (!token) {
+          this.message = "Token not found. Please login first.";
+          return;
+        }
+
+        axios.get('http://localhost:8000/protected', { // Change URL if needed
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        .then(response => {
+          this.message = response.data.message + ' | User: ' + response.data.user;
+        })
+        .catch(error => {
+          this.message = 'Access denied: ' + (error.response?.data?.detail || error.message);
+        });
+      }
+
+            }
+        }).mount("#app2");
 
         createApp({
             data() {
                 return {
                     username: '',
                     password: '',
-                    responseMessage: ''
+                    responseMessage: '',
+                    tokens:''
                 };
             },
             methods: {
+
                 async loginUser() {
                     try {
                         const response = await axios.post('http://127.0.0.1:8000/developer_auth', {
                             username: this.username,
                             password: this.password
                         });
+
                         this.responseMessage = response.data.message;
+                        this.tokens = response.data.token;
+                        localStorage.setItem('jwtToken', this.tokens);
+                        window.location.href = 'main.html';
+
                     } catch (error) {
                         if (error.response) {
                             this.responseMessage = error.response.data.detail || 'An error occurred';

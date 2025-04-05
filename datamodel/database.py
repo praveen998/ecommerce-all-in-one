@@ -86,7 +86,6 @@ class User(Base):
 
 class OwnerDetails(Base):
     __tablename__= 'ownerdetails'
-    
     ownerid=        Column(Integer,primary_key=True)
     company_name=   Column(String(100), nullable=False,unique=True)
     owner_name=     Column(String(100), nullable=False)

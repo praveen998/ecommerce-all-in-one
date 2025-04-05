@@ -1,10 +1,10 @@
+from fastapi import Depends,HTTPException,Request
 import os
 import bcrypt
 from dotenv import load_dotenv
 import asyncio
 from jose import jwt, JWTError
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import Depends,HTTPException
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 
@@ -32,6 +32,7 @@ class Hashing:
 
 
 class JWTHandler:
+   
     def __init__(self, secret_key: str, algorithm: str, expire_minutes: int):
         self.secret_key = secret_key
         self.algorithm = algorithm
@@ -56,7 +57,7 @@ class JWTHandler:
             )
     
     @staticmethod
-    def jwt_header_extraction(jwt_handler:JWTHandler):
+    def jwt_header_extraction(jwt_handler:"JWTHandler",request:Request):
         token = request.headers.get("Authorization")
         if not token or not token.startswith("Bearer "):
             raise HTTPException(status_code=401, detail="Token not provided or invalid format")
@@ -65,3 +66,7 @@ class JWTHandler:
         return {"message": "Access granted", "user": payload}
 
 
+
+class Rawsqlquery:
+
+    
