@@ -6,7 +6,7 @@ import asyncio
 from jose import jwt, JWTError
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
+from typing import Optional, Dict,List,Tuple,Any
 
 
 load_dotenv()
@@ -68,5 +68,87 @@ class JWTHandler:
 
 
 class Rawsqlquery:
+
+    @staticmethod
+    async def insertion_query(mysql_pool,query:str,params:Optional[Tuple[Any,...]]=None) -> int :
+        try:
+            conn: Connection = await mysql_pool.get_connection()
+            async with conn.cursor() as cursor:
+                if params:
+                    await cursor.execute(query, params)
+                else:
+                    await cursor.execute(query)
+                await conn.commit()  # Commit for insert/update/delete
+                affected_rows = cursor.rowcount  # Returns number of rows inserted
+                return affected_rows
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Insertion error: {str(e)}")
+
+        finally:
+            if conn:
+                await mysql_pool.release_connection(conn)
+
+
+    @staticmethod
+    async def selection_query(mysql_pool,query: str,params: Optional[Tuple[Any,...]]=None) -> List[Tuple]:
+        try:
+            conn: Connection = await mysql_pool.get_connection()
+            async with conn.cursor() as cursor:
+                if params:
+                    await cursor.execute(query,params)
+                else:
+                    await cursor.execute(query)
+                result = await cursor.fetchall()
+                await mysql_pool.release_connection(conn)
+                return result
+        except Exception as e:
+             raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        
+        finally:
+            if conn:
+               await mysql_pool.release_connection(conn)
+
+
+    async def deletion_query(mysql_pool,query:str,params:Optional[Tuple[Any,...]]=None) -> int :
+        try:
+            conn: Connection = await mysql_pool.get_connection()
+            async with conn.cursor() as cursor:
+                if params:
+                    await cursor.execute(query, params)
+                else:
+                    await cursor.execute(query)
+                await conn.commit()
+                affected_rows = cursor.rowcount
+                return affected_rows
+
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Deletion error: {str(e)}")
+
+        finally:
+            if conn:
+                await mysql_pool.release_connection(conn)
+
+    
+    async def updation_query(mysql_pool,query:str,params:Optional[Tuple[Any,...]]=None) -> int :
+        try:
+            conn: Connection = await mysql_pool.get_connection()
+            async with conn.cursor() as cursor:
+                if params:
+                    await cursor.execute(query, params)
+                else:
+                    await cursor.execute(query)
+                await conn.commit()
+                affected_rows = cursor.rowcount
+                return affected_rows
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Update error: {str(e)}")
+
+        finally:
+            if conn:
+                await mysql_pool.release_connection(conn)
+
+
+
+
 
     

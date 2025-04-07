@@ -53,7 +53,7 @@ class Mysqlpool:
 
 #------------------------------------------------------------------------------------------------------
 
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, Integer, String,ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -87,12 +87,20 @@ class User(Base):
 class OwnerDetails(Base):
     __tablename__= 'ownerdetails'
     ownerid=        Column(Integer,primary_key=True)
-    company_name=   Column(String(100), nullable=False,unique=True)
+    company_name=   Column(String(100), nullable=False)
     owner_name=     Column(String(100), nullable=False)
-    phone=          Column(String(50), nullable=False,unique=True)
+    phone=          Column(String(50), nullable=False)
     username=       Column(String(100), nullable=False,unique=True)
     password=       Column(String(100), nullable=False,unique=True)
     company_type=   Column(String(100), nullable=False)
+
+
+class WebsiteDetails(Base):
+    __tablename__='websitedetails'
+    website_id=Column(Integer,primary_key=True)
+    owner_id=Column(Integer,ForeignKey('ownerdetails.ownerid'),nullable=False)
+    website_name=Column(String(100),nullable=False)
+
 
 
 Base.metadata.create_all(engine)

@@ -2,6 +2,7 @@
 
 posting owner details into backend
 ------------------------------------------------------------------------------------------------------
+
 curl -X POST http://127.0.0.1:8000/register_owner/ \
 -H "Content-Type: application/json" \
 -d '{
@@ -12,5 +13,36 @@ curl -X POST http://127.0.0.1:8000/register_owner/ \
   "password": "securepass123",
   "company_type": "Software"
 }'
+
+
+#posting user table insertion
+
+curl -X POST http://127.0.0.1:8000/items_insertion/ \
+-H "Content-Type: application/json" \
+-d '{
+  "user_name": "Praveen",
+  "email": "praveen@gmail.com",
+  "password": "12345"
+}'
+
+
+#posting user table deletion
+
+curl -X POST http://127.0.0.1:8000/items_deletion/ \
+-H "Content-Type: application/json" \
+-d '{
+  "user_id": 4
+}'
+
+
+#posting user table updation
+
+curl -X POST http://127.0.0.1:8000/items_updation/ \
+-H "Content-Type: application/json" \
+-d '{
+  "user_name": "naveen",
+  "user_id":5
+}'
+
 
 
